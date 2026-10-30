@@ -3,6 +3,7 @@ import time
 from pages.product_page import ProductPage
 from pages.locators import ProductPageLocators 
 from pages.basket_page import BasketPage
+from pages.login_page import LoginPage
 
 @pytest.mark.parametrize('link', [
     "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer0",
@@ -90,3 +91,41 @@ class TestLoginFromProductPage:
         page = ProductPage(browser, link)
         page.open()
         page.should_be_login_link()
+
+@pytest.mark.login
+class TestUserAddToBasketFromProductPage:
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self, browser):
+        # 1. Открываем страницу регистрации
+        link = "http://selenium1py.pythonanywhere.com/en-gb/accounts/login/"
+        page = LoginPage(browser, link)
+        page.open()
+        
+        # 2. Генерируем уникальный email и регистрируемся
+        email = str(time.time()) + "@fakemail.org"
+        password = "SuperSecretPassword123!"
+        page.register_new_user(email, password)
+        
+        # 3. Проверяем, что пользователь залогинен
+        page.should_be_authorized_user()
+        
+
+    def test_user_cant_see_success_message(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+        page = ProductPage(browser, link)
+        page.open()
+        page.should_not_be_success_message()
+
+    def test_user_can_add_product_to_basket(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
+        page = ProductPage(browser, link)
+        page.open()
+        
+        product_name = page.get_product_name()
+        product_price = page.get_product_price()
+        
+        page.add_to_basket()
+        time.sleep(1)
+        
+        page.should_be_add_to_basket_message(product_name)
+        page.should_be_correct_basket_total(product_price)
