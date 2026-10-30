@@ -19,3 +19,8 @@ class ProductPage(BasePage):
     def should_be_correct_basket_total(self, product_price):
         basket_total = self.browser.find_element(*ProductPageLocators.BASKET_TOTAL).text
         assert product_price == basket_total, f"Цена не совпадает: {product_price} != {basket_total}"
+
+    def should_not_be_success_message(self):
+        # Проверяем, что сообщения об успехе НЕТ на странице
+        assert self.is_not_element_present(*ProductPageLocators.SUCCESS_MESSAGE), \
+            "Success message is presented, but should not be"
