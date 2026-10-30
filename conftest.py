@@ -11,8 +11,9 @@ def browser(request):
     user_language = request.config.getoption("--language")
     
     options = Options()
-    # Устанавливаем язык для Chrome
     options.add_experimental_option('prefs', {'intl.accept_languages': user_language})
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-ssl-errors')
     
     print(f"\nstart chrome browser for test.. with language: {user_language}")
     browser = webdriver.Chrome(options=options)
